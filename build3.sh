@@ -274,18 +274,6 @@ gen_zip() {
 		java -jar zipsigner-3.0.jar "$ZIPNAME"-"$DEVICE".zip "$ZIPNAME"-"$DEVICE"-signed.zip
 		ZIP_FINAL="$ZIPNAME-$DEVICE-signed.zip"
 	fi
-
-	tg_post_build "$ZIP_FINAL" "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
-	cd ..
-}
-
-release() {
-        msg "|| Releasing Build ||"
-	scp AnyKernel3/$ZIP_FINAL cryllicbuster@frs.sourceforge.net:/home/frs/p/stormbreakerdevices/phoenix/
-	msg "|| Uploaded $ZIP_FINAL on SourceForge ||"
-}
-
-clone
 exports
 build_kernel
 if [ $RELEASE = 1 ]
