@@ -39,9 +39,6 @@ KERNEL_DIR=$PWD
 # Kernel Version
 VERSION="4.2"
 
-# Sign Kernel or not
-SIGN=1
-
 # The name of the device for which the kernel is built
 MODEL="Poco X2/Redmi K30"
 
@@ -50,7 +47,7 @@ DEVICE="phoenix"
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=vendor/phoenix-perf_defconfig
+DEFCONFIG=vendor/phoenix_defconfig
 
 # Specify compiler.
 # 'clang' or 'gcc'
@@ -61,14 +58,6 @@ INCREMENTAL=1
 
 # Whether to release build or not
 RELEASE=${1}
-
-# Push ZIP to Telegram. 1 is YES | 0 is NO(default)
-PTTG=1
-	if [ $PTTG = 1 ]
-	then
-		# Set Telegram Chat ID
-		CHATID="-1001278854279"
-	fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
 DEF_REG=1
@@ -94,7 +83,6 @@ LOG_DEBUG=0
 ## Set defaults first
 DISTRO=$(cat /etc/*-release | head -n 1 | cut -b 7- | sed s/.$//)
 KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
-CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 export KBUILD_BUILD_HOST CI_BRANCH
 
 ## Check for CI
@@ -120,13 +108,13 @@ fi
 KERVER=$(make kernelversion)
 
 # The name of the Kernel, to name the ZIP
-ZIPNAME="StormBreaker-$VERSION"
+ZIPNAME="Drona-$VERSION"
 
 # Set a commit head
 COMMIT_HEAD=$(git log --oneline -1)
 
 # Set Date
-DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
+DATE=$(TZ=Asia/India date +"%Y%m%d-%T")
 
 #Now Its time for other stuffs like cloning, exporting, etc
 
@@ -157,8 +145,8 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 ##------------------------------------------------------##
 
 exports() {
-	export KBUILD_BUILD_USER="CryllicBuster273"
-        export KBUILD_BUILD_HOST="StormBreakerBot"
+	export KBUILD_BUILD_USER="Dronacharya"
+        export KBUILD_BUILD_HOST="DronaRobot"
 	export ARCH=arm64
 	export SUBARCH=arm64
 
@@ -173,36 +161,11 @@ exports() {
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
-	export BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
-	export BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
 	PROCS=$(nproc --all)
 	export PROCS
 }
 
 ##---------------------------------------------------------##
-
-tg_post_msg() {
-	curl -s -X POST "$BOT_MSG_URL" -d chat_id="$2" \
-	-d "disable_web_page_preview=true" \
-	-d "parse_mode=html" \
-	-d text="$1"
-
-}
-
-##----------------------------------------------------------------##
-
-tg_post_build() {
-	#Post MD5Checksum alongwith for easeness
-	MD5CHECK=$(md5sum "$1" | cut -d' ' -f1)
-
-	#Show the Checksum alongwith caption
-	curl --progress-bar -F document=@"$1" "$BOT_BUILD_URL" \
-	-F chat_id="$2"  \
-	-F "disable_web_page_preview=true" \
-	-F "parse_mode=html" \
-	-F caption="$3 | <b>MD5 Checksum : </b><code>$MD5CHECK</code>"
-}
-
 ##----------------------------------------------------------##
 
 build_kernel() {
